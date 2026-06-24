@@ -579,6 +579,41 @@ Test coverage includes:
 - Full SNS-wrapped SQS event integration path
 - Multiple records and partial batch failures
 
+## GitHub Actions CI
+
+The repository includes a GitHub Actions workflow at:
+
+```text
+.github/workflows/maven.yml
+```
+
+The workflow runs on:
+
+- Pushes to `main`
+- Pull requests targeting `main`
+- Manual runs through the GitHub Actions `Run workflow` button
+
+The CI job uses Java 25 and runs:
+
+```bash
+mvn -B clean verify --file pom.xml
+```
+
+This means GitHub Actions runs the unit tests, integration tests, JaCoCo report generation, and the configured 90% line coverage gate. If the coverage check fails, the workflow fails.
+
+After a successful run, GitHub uploads two workflow artifacts:
+
+- `aws-order-processor-lambda`: the deployable Lambda jar from `target/aws-order-processor-*-aws-lambda.jar`
+- `jacoco-report`: the HTML coverage report from `target/site/jacoco`
+
+For a public repository:
+
+- Anyone can view the workflow file and public workflow results.
+- Repository collaborators with write access can manually run the workflow from `Actions -> Java CI with Maven -> Run workflow`.
+- External reviewers without write access cannot manually run workflows in your repository.
+- External reviewers can fork the repository and run the workflow in their fork.
+- Pull requests from forks can trigger the pull request workflow, but GitHub may require maintainer approval for first-time contributors depending on repository settings.
+
 ## Sample Payloads
 
 - `samples/digital-order.json`
