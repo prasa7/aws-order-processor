@@ -1,0 +1,13 @@
+{
+  "eventId": "evt-physical-001",
+  "correlationId": "corr-002",
+  "orderId": "order-002",
+  "customerId": "customer-67890",
+  "customerEmail": "grace@example.com",
+  "orderType": "PHYSICAL",
+  "amount": 89.99,
+  "currency": "USD",
+  "occurredAt": "2026-06-23T10:20:30Z",
+  "shippingAddress": "1 Lambda Way, Seattle, WA",
+  "shippingMethod": "EXPRESS"
+}

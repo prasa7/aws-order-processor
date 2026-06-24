@@ -1,0 +1,294 @@
+openapi: 3.1.0
+info:
+  title: AWS Order Processor API
+  version: 1.0.0
+  description: >
+    Optional secured HTTP API for processing order events through the same
+    service path used by the SNS-to-SQS AWS Lambda handler.
+servers:
+  - url: http://localhost:8080
+    description: Local servlet runtime
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/orders/process:
+    post:
+      operationId: processOrder
+      summary: Process a direct order event
+      description: >
+        Validates a direct DigitalOrder or PhysicalOrder payload, applies
+        idempotency, processes the order, and publishes an OrderProcessedEvent
+        notification to SNS.
+      tags:
+        - Orders
+      parameters:
+        - name: X-Request-Id
+          in: header
+          required: false
+          description: Client supplied request id used in structured logs.
+          schema:
+            type: string
+            example: api-request-001
+        - name: X-Forwarded-For
+          in: header
+          required: false
+          description: Forwarded client IP list. The first value is logged as sourceIp.
+          schema:
+            type: string
+            example: 203.0.113.10, 10.0.0.5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/DigitalOrder'
+                - $ref: '#/components/schemas/PhysicalOrder'
+              discriminator:
+                propertyName: orderType
+                mapping:
+                  DIGITAL: '#/components/schemas/DigitalOrder'
+                  PHYSICAL: '#/components/schemas/PhysicalOrder'
+            examples:
+              digital:
+                summary: Digital order
+                value:
+                  eventId: evt-digital-001
+                  correlationId: corr-001
+                  orderId: order-001
+                  customerId: customer-12345
+                  customerEmail: ada@example.com
+                  orderType: DIGITAL
+                  amount: 49.99
+                  currency: USD
+                  occurredAt: '2026-06-23T10:15:30Z'
+                  productCode: EBOOK-001
+                  downloadUrl: https://downloads.example.com/order-001
+              physical:
+                summary: Physical order
+                value:
+                  eventId: evt-physical-001
+                  correlationId: corr-002
+                  orderId: order-002
+                  customerId: customer-67890
+                  customerEmail: grace@example.com
+                  orderType: PHYSICAL
+                  amount: 89.99
+                  currency: USD
+                  occurredAt: '2026-06-23T10:20:30Z'
+                  shippingAddress: 1 Lambda Way, Seattle, WA
+                  shippingMethod: EXPRESS
+      responses:
+        '202':
+          description: Order accepted and processed, or duplicate event skipped.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderApiResponse'
+              examples:
+                processed:
+                  value:
+                    status: PROCESSED
+                    eventId: evt-digital-001
+                    processedEventId: generated-uuid
+                    correlationId: corr-001
+                    orderId: order-001
+                    orderType: DIGITAL
+                    processedAt: '2026-06-23T10:30:00Z'
+                duplicate:
+                  value:
+                    status: DUPLICATE_SKIPPED
+                    eventId: evt-digital-001
+                    processedEventId: null
+                    correlationId: corr-001
+                    orderId: order-001
+                    orderType: DIGITAL
+                    processedAt: null
+        '400':
+          description: Validation failure, malformed JSON, unsupported order type, or payload too large.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderApiErrorResponse'
+        '401':
+          description: Missing or invalid API token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '502':
+          description: Notification publish failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderApiErrorResponse'
+        '500':
+          description: Unexpected order-processing failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderApiErrorResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque-token
+      description: Token value from ORDER_API_AUTH_TOKEN.
+  schemas:
+    OrderType:
+      type: string
+      enum:
+        - DIGITAL
+        - PHYSICAL
+    BaseOrder:
+      type: object
+      required:
+        - eventId
+        - correlationId
+        - orderId
+        - customerId
+        - customerEmail
+        - orderType
+        - amount
+        - currency
+        - occurredAt
+      properties:
+        eventId:
+          type: string
+          minLength: 1
+          example: evt-digital-001
+        correlationId:
+          type: string
+          minLength: 1
+          example: corr-001
+        orderId:
+          type: string
+          minLength: 1
+          example: order-001
+        customerId:
+          type: string
+          minLength: 1
+          example: customer-12345
+        customerEmail:
+          type: string
+          format: email
+          example: ada@example.com
+        orderType:
+          $ref: '#/components/schemas/OrderType'
+        amount:
+          type: number
+          format: double
+          example: 49.99
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: USD
+        occurredAt:
+          type: string
+          format: date-time
+          example: '2026-06-23T10:15:30Z'
+    DigitalOrder:
+      allOf:
+        - $ref: '#/components/schemas/BaseOrder'
+        - type: object
+          required:
+            - productCode
+            - downloadUrl
+          properties:
+            orderType:
+              type: string
+              const: DIGITAL
+            productCode:
+              type: string
+              minLength: 1
+              example: EBOOK-001
+            downloadUrl:
+              type: string
+              format: uri
+              example: https://downloads.example.com/order-001
+    PhysicalOrder:
+      allOf:
+        - $ref: '#/components/schemas/BaseOrder'
+        - type: object
+          required:
+            - shippingAddress
+            - shippingMethod
+          properties:
+            orderType:
+              type: string
+              const: PHYSICAL
+            shippingAddress:
+              type: string
+              minLength: 1
+              example: 1 Lambda Way, Seattle, WA
+            shippingMethod:
+              type: string
+              minLength: 1
+              example: EXPRESS
+    OrderApiResponse:
+      type: object
+      required:
+        - status
+        - eventId
+        - correlationId
+        - orderId
+        - orderType
+      properties:
+        status:
+          type: string
+          enum:
+            - PROCESSED
+            - DUPLICATE_SKIPPED
+        eventId:
+          type: string
+          example: evt-digital-001
+        processedEventId:
+          type:
+            - string
+            - 'null'
+          example: generated-uuid
+        correlationId:
+          type: string
+          example: corr-001
+        orderId:
+          type: string
+          example: order-001
+        orderType:
+          $ref: '#/components/schemas/OrderType'
+        processedAt:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          example: '2026-06-23T10:30:00Z'
+    OrderApiErrorResponse:
+      type: object
+      required:
+        - timestamp
+        - status
+        - error
+        - message
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-06-23T10:30:00Z'
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        message:
+          type: string
+          example: orderType is required
+    UnauthorizedResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Unauthorized

@@ -1,0 +1,20 @@
+{
+  "Records": [
+    {
+      "messageId": "sqs-message-001",
+      "receiptHandle": "sample-receipt-handle",
+      "body": "{\"Type\":\"Notification\",\"MessageId\":\"sns-message-001\",\"TopicArn\":\"arn:aws:sns:us-east-1:xxxxxxxxx:OrderCreatedTopic\",\"Message\":\"{\\\"eventId\\\":\\\"evt-digital-001\\\",\\\"correlationId\\\":\\\"corr-001\\\",\\\"orderId\\\":\\\"order-001\\\",\\\"customerId\\\":\\\"customer-12345\\\",\\\"customerEmail\\\":\\\"ada@example.com\\\",\\\"orderType\\\":\\\"DIGITAL\\\",\\\"amount\\\":49.99,\\\"currency\\\":\\\"USD\\\",\\\"occurredAt\\\":\\\"2026-06-23T10:15:30Z\\\",\\\"productCode\\\":\\\"EBOOK-001\\\",\\\"downloadUrl\\\":\\\"https://downloads.example.com/order-001\\\"}\",\"Timestamp\":\"2026-06-23T10:21:30Z\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1782209970000",
+        "SenderId": "AIDAEXAMPLE",
+        "ApproximateFirstReceiveTimestamp": "1782209975000"
+      },
+      "messageAttributes": {},
+      "md5OfBody": "sample-md5",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:us-east-1:xxxxxxxxx:OrderProcessingQueue",
+      "awsRegion": "us-east-1"
+    }
+  ]
+}

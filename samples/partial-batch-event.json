@@ -1,0 +1,30 @@
+{
+  "Records": [
+    {
+      "messageId": "sqs-message-success",
+      "receiptHandle": "sample-receipt-handle-success",
+      "body": "{\"Type\":\"Notification\",\"MessageId\":\"sns-message-success\",\"TopicArn\":\"arn:aws:sns:us-east-1:xxxxxxxxx:OrderCreatedTopic\",\"Message\":\"{\\\"eventId\\\":\\\"evt-physical-001\\\",\\\"correlationId\\\":\\\"corr-002\\\",\\\"orderId\\\":\\\"order-002\\\",\\\"customerId\\\":\\\"customer-67890\\\",\\\"customerEmail\\\":\\\"grace@example.com\\\",\\\"orderType\\\":\\\"PHYSICAL\\\",\\\"amount\\\":89.99,\\\"currency\\\":\\\"USD\\\",\\\"occurredAt\\\":\\\"2026-06-23T10:20:30Z\\\",\\\"shippingAddress\\\":\\\"1 Lambda Way, Seattle, WA\\\",\\\"shippingMethod\\\":\\\"EXPRESS\\\"}\",\"Timestamp\":\"2026-06-23T10:22:30Z\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1"
+      },
+      "messageAttributes": {},
+      "md5OfBody": "sample-md5",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:us-east-1:xxxxxxxxx:OrderProcessingQueue",
+      "awsRegion": "us-east-1"
+    },
+    {
+      "messageId": "sqs-message-failure",
+      "receiptHandle": "sample-receipt-handle-failure",
+      "body": "{\"Type\":\"Notification\",\"MessageId\":\"sns-message-failure\",\"TopicArn\":\"arn:aws:sns:us-east-1:xxxxxxxxx:OrderCreatedTopic\",\"Message\":\"{\\\"eventId\\\":\\\"evt-invalid-001\\\",\\\"correlationId\\\":\\\"corr-invalid\\\",\\\"orderId\\\":\\\"order-invalid\\\",\\\"customerId\\\":\\\"customer-invalid\\\",\\\"customerEmail\\\":\\\"invalid@example.com\\\",\\\"orderType\\\":\\\"UNKNOWN\\\",\\\"amount\\\":19.99,\\\"currency\\\":\\\"USD\\\",\\\"occurredAt\\\":\\\"2026-06-23T10:25:30Z\\\"}\",\"Timestamp\":\"2026-06-23T10:26:30Z\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1"
+      },
+      "messageAttributes": {},
+      "md5OfBody": "sample-md5",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:us-east-1:xxxxxxxxx:OrderProcessingQueue",
+      "awsRegion": "us-east-1"
+    }
+  ]
+}

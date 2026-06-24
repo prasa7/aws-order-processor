@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: order-processor
+  main:
+    web-application-type: none
+
+order:
+  service-name: ${ORDER_SERVICE_NAME:order-processor}
+  environment: ${ORDER_ENVIRONMENT:local}
+  aws-region: ${AWS_REGION:us-east-1}
+  order-processed-topic-arn: ${ORDER_PROCESSED_TOPIC_ARN:arn:aws:sns:ap-southeast-4:842071678386:order-processed-topic}
+  enable-idempotency: ${ORDER_ENABLE_IDEMPOTENCY:false}
+  max-retry-count: ${ORDER_MAX_RETRY_COUNT:3}
+  structured-logging: ${ORDER_STRUCTURED_LOGGING:true}
+  reference-data-cache-ttl-seconds: ${ORDER_REFERENCE_DATA_CACHE_TTL_SECONDS:300}
+  max-payload-size-bytes: ${ORDER_MAX_PAYLOAD_SIZE_BYTES:262144}
+  mask-customer-id-in-logs: ${ORDER_MASK_CUSTOMER_ID_IN_LOGS:false}
+  enable-strict-json-validation: ${ORDER_ENABLE_STRICT_JSON_VALIDATION:true}
+  enable-virtual-threads: ${ORDER_ENABLE_VIRTUAL_THREADS:false}
+  enable-notification-publishing: ${ORDER_ENABLE_NOTIFICATION_PUBLISHING:true}
+  api:
+    enabled: ${ORDER_API_ENABLED:false}
+    base-path: ${ORDER_API_BASE_PATH:/api/v1/orders}
+    auth-header-name: ${ORDER_API_AUTH_HEADER_NAME:Authorization}
+    auth-token: ${ORDER_API_AUTH_TOKEN:}
+    principal-name: ${ORDER_API_PRINCIPAL_NAME:order-api-client}

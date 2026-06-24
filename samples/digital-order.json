@@ -1,0 +1,13 @@
+{
+  "eventId": "evt-digital-001",
+  "correlationId": "corr-001",
+  "orderId": "order-001",
+  "customerId": "customer-12345",
+  "customerEmail": "ada@example.com",
+  "orderType": "DIGITAL",
+  "amount": 49.99,
+  "currency": "USD",
+  "occurredAt": "2026-06-23T10:15:30Z",
+  "productCode": "EBOOK-001",
+  "downloadUrl": "https://downloads.example.com/order-001"
+}
